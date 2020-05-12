@@ -1,9 +1,9 @@
 import numpy as np
-
+from scipy.cluster.vq import vq, kmeans, whiten
 class RBFNetwork:
 
-    def __init__(self, c, rate, b, w, x, sigma, target, max_epochs):
-        self.c = c
+    def __init__(self, initc, rate, b, w, x, sigma, target, max_epochs, max_epochs_kmeans):
+        self.c = kmeans(x, initc, max_epochs_kmeans)[0]
         self.rate = rate
         self.b = b
         self.w = w
@@ -81,19 +81,22 @@ class RBFNetwork:
                 break
 
 def main():
-    c = np.array([[0, -0.5], [-1, -0.5]])
+    initc = np.array([[0, 0], [-1, -0]])
+    max_epochs_kmeans = 2
     rate = 1
     b = 1
     w = np.array([1, 1])
-    x = np.array([[0, 0], [0, -1], [-1, 0], [-1, -1]])
+    x = np.array([[0, 0], [0, -1], [-1, 0], [-1, -1]],dtype=float)
     sigma = 1
     target = np.array([1, 0, 0, 1])
     max_epochs = 3
 
-    rbfNetwork = RBFNetwork(c, rate, b, w, x, sigma, target, max_epochs)
+    rbfNetwork = RBFNetwork(initc, rate, b, w, x, sigma, target, max_epochs, max_epochs_kmeans)
     rbfNetwork.train()
-    rbfNetwork.query(np.array([1, 1]))
-
+    rbfNetwork.query(np.array([0, 0]))
+    rbfNetwork.query(np.array([-1, 0]))
+    rbfNetwork.query(np.array([0, -1]))
+    rbfNetwork.query(np.array([-1, -1]))
 
 if __name__ == '__main__':
     main()
